@@ -24,10 +24,10 @@ Globals:
       Role: !Ref CodeDeployRole
 
 Resources:
-  GetHelloWorld:
+  Index:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: index.get
+      Handler: build/lambda.handler
       Runtime: nodejs10.x
       Role:
         Fn::GetAtt:
