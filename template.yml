@@ -34,11 +34,21 @@ Resources:
         - LambdaExecutionRole
         - Arn
       Events:
-        GetEvent:
+        IndexEvent:
           Type: Api
           Properties:
             Path: /
             Method: get
+        GraphQLPlaygroundEvent:
+          Type: Api
+          Properties:
+            Path: /graphql
+            Method: get
+        GraphQLEvent:
+          Type: Api
+          Properties:
+            Path: /graphql
+            Method: post
   LambdaExecutionRole:
     Description: Creating service role in IAM for AWS Lambda
     Type: AWS::IAM::Role
