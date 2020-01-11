@@ -3,46 +3,49 @@ import { gql } from "apollo-server-express";
 const typeDefs = gql`
 
     interface DescribableObject {
+        id: ID
         description: ObjectDescription
-        descriptions: [ObjectDescription]
         label: String        
+    }
+    
+    interface Modifier {
+        id: ID
+        value: Int
+        exclusive: Boolean
     }
 
     type Language implements DescribableObject {
-        id: ID!
+        id: ID
         description: ObjectDescription
-        descriptions: [ObjectDescription]
         label: String
     }
 
     type ObjectDescription {
-        id: ID!
-        objectId: ID!
-        objectType: String!
-        language: Language!
-        shortText: String!
+        id: ID
+        objectId: ID
+        objectType: String
+        language: Language
+        shortText: String
         longText: String
     }
 
     type GlossaryItem implements DescribableObject {
-        id: ID!
+        id: ID
         description: ObjectDescription
-        descriptions: [ObjectDescription]
         label: String 
         book: Book      
     }
 
     type Dice {
-        id: ID!
-        label: String!
-        minValue: Integer!
-        maxValue: Integer!
+        id: ID
+        label: String
+        minValue: Int
+        maxValue: Int
     }
 
     type Book implements DescribableObject {
-        id: ID!
+        id: ID
         description: ObjectDescription
-        descriptions: [ObjectDescription]
         label: String
     }
 
@@ -54,114 +57,135 @@ const typeDefs = gql`
     }
 
     type Ability implements DescribableObject {
-        id: ID!
+        id: ID
         description: ObjectDescription
-        descriptions: [ObjectDescription]
         label: String
         book: Book
     }
 
-    type AbilityModifier {
-        id: ID!
-        ability: Ability!
-        value: Integer!
+    type AbilityModifier implements Modifier{
+        id: ID
+        ability: Ability
+        value: Int
+        exclusive: Boolean
+    }
+    
+    type AbilityCalculationType implements DescribableObject{
+        id: ID
+        description: ObjectDescription
+        label: String
+        dice: Dice
+        throwCount: Int
+        repetitionCount: Int
+        constantComponent: Int
+    }
+    
+    type AbilityCalculation {
+        id: ID
+        ability: Ability
+        calculationType: AbilityCalculationType
     }
 
     type CombatValue implements DescribableObject {
-        id: ID!
+        id: ID
         description: ObjectDescription
-        descriptions: [ObjectDescription]
-        label: String        
+        label: String  
+        sourceAbility: [Ability]
     }
 
-    type CombatValueModifier {
+    type CombatValueModifier implements Modifier{
         id: ID!
         combatValue: CombatValue
-        value: Integer
+        value: Int
+        exclusive: Boolean
     }
 
     type HealthValue implements DescribableObject {
-        id: ID!
+        id: ID
         description: ObjectDescription
-        descriptions: [ObjectDescription]
-        label: String        
-    }
-
-    type HealthValueModifier {
-        id: ID!
-        healthValue: HealthValue
-        value: Integer
-    }
-
-    type Race implements DescribableObject {
-        id: ID!
-        description: ObjectDescription
-        descriptions: [ObjectDescription]
         label: String
-        classes: [Class]
-        abilityModifiers: [AbilityModifier]
-        SpecialAbilities: [SpecialAbility]
-        book: Book        
+        sourceAbilities: [Ability]
+    }
+
+    type HealthValueModifier implements Modifier{
+        id: ID
+        healthValue: HealthValue
+        value: Int
+        exclusive: Boolean
     }
 
     type SpecialAbility implements DescribableObject {
-        id: ID!
+        id: ID
         description: ObjectDescription
-        descriptions: [ObjectDescription]
         label: String
     }
 
-    type AgeGroup  implements DescribableObject {
-        id: ID!
+    type AgeGroup implements DescribableObject {
+        id: ID
         description: ObjectDescription
-        descriptions: [ObjectDescription]
         label: String
-        abilityModifiers: [AbilityModifier]           
+        abilityModifiers: [AbilityModifier]
+    }    
+    
+    type RaceAgeGroupAssociation {
+        id: ID
+        race: Race
+        from: Int
+        to: Int
+        ageGroup: AgeGroup
     }
-
-    type MainClass implements DescribableObject {
-        id: ID!
+    
+    type Race implements DescribableObject {
+        id: ID
         description: ObjectDescription
-        descriptions: [ObjectDescription]
         label: String
+        abilityModifiers: [AbilityModifier]
+        specialAbilities: [SpecialAbility]
+        combatValueModifiers: [CombatValueModifier]
+        healthValueModifiers: [HealthValueModifier]
         book: Book
-        classes: [Class]        
+        ageGroupAssociations: [RaceAgeGroupAssociation]
+        classAssociations: [RaceClassAssociation]
+        skillAssociations: [SkillAssociation]
+        percentageSkillAssociations: [PercentageSkillAssociation]
+    }
+    
+    type RaceClassAssociation {
+        id: ID
+        race: Race
+        class: Class
+        allowed: Boolean
+        specialPermission: Boolean
+    }
+    
+    type LevelDefinition {
+        id: ID
+        level: Int
+        fromExperiencePoints: Int
+        toExperiencePoints: Int
     }
 
     type Class implements DescribableObject {
-        id: ID!
+        id: ID
         description: ObjectDescription
-        descriptions: [ObjectDescription]
         label: String
-        races: [Race]
-        mainClass: MainClass
-        subClasses: [SubClass]
-        book: Book        
-    }
-
-    type SubClass implements DescribableObject {
-        id: ID!
-        description: ObjectDescription
-        descriptions: [ObjectDescription]
-        label: String
-        class: Class
-        specialisations: [SubClassSpecialisation]
-        book: Book        
-    }
-
-    type SubClassSpecialisation implements DescribableObject {
-        id: ID!
-        description: ObjectDescription
-        descriptions: [ObjectDescription]
-        label: String
-        subClass: SubClass!
-        book: Book              
+        mainClass: Boolean
+        superClass: Class
+        subClasses: [Class]
+        book: Book
+        experienceForNextLevel: Int
+        raceAssociations: [RaceClassAssociation]
+        abilityCalculations: [AbilityCalculation]
+        healthValueModifiers: [HealthValueModifier]
+        combatValueModifiers: [CombatValueModifier]
+        healhValueModifiers: [HealthValueModifier]
+        levelDefinitions: [LevelDefinition]
+        skillAssociations: [SkillAssociation]
     }
 
     type SkillCategory implements DescribableObject {
-        id: ID!
+        id: ID
         description: ObjectDescription
-        descriptions: [ObjectDescription]
         label: String
     }
 
@@ -171,29 +195,78 @@ const typeDefs = gql`
         descriptions: [ObjectDescription]
         label: String
         skillCategory: SkillCategory
+        basicLevelCost: Int
+        masterLevelCost: Int
+    }
+    
+    enum SkillLevel{
+        BASIC
+        MASTER
+    }
+    
+    type SkillAssociation {
+        id: ID
+        level: Int
+        skill: Skill
+        skillLevel: SkillLevel
     }
 
     type PercentageSkill implements DescribableObject {
-        id: ID!
+        id: ID
         description: ObjectDescription
-        descriptions: [ObjectDescription]
         label: String
         skillCategory: SkillCategory
     }
+    
+    type PercentageSkillAssociation {
+        id: ID
+        level: Int
+        percentageSkill: PercentageSkill
+        percentageValue: Int
+    }
 
     type Weapon implements DescribableObject {
-        id: ID!
+        id: ID
         description: ObjectDescription
-        descriptions: [ObjectDescription]
         label: String
+        combatValueModifiers: [CombatValueModifier]
     }
 
     type RangedWeapon implements DescribableObject {
-        id: ID!
+        id: ID
         description: ObjectDescription
-        descriptions: [ObjectDescription]
         label: String
-    }            
+        combatValueModifiers: [CombatValueModifier]
+    }
+
+    type Shield implements DescribableObject {
+        id: ID
+        description: ObjectDescription
+        label: String
+        combatValueModifiers: [CombatValueModifier]
+    }    
+    
+    type Armour implements DescribableObject {
+        id: ID
+        description: ObjectDescription
+        label: String
+        movementRestrictionFactor: Int
+        damageAbsorptionValue: Int
+    }
+    
+    type ItemCategory implements DescribableObject {
+        id: ID
+        description: ObjectDescription
+        label: String
+        items: [Item]
+    }    
+    
+    type Item implements DescribableObject {
+        id: ID
+        description: ObjectDescription
+        label: String
+        itemCategory: ItemCategory
+    }
 
     type Query {
         test: [String]
