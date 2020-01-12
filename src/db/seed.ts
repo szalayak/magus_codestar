@@ -44,6 +44,5 @@ for (const item of test2) {
             console.log("PutItems succeeded:", JSON.stringify(data));
         }
     })
-}
-;
+};
 
