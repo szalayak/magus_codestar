@@ -1,0 +1,20 @@
+[
+  {
+    "type": {"S": "test1"},
+    "id": {"S": "1"},
+    "attr1": {"S":  "attr1value"},
+    "attr2": {"S":  "attr2value"}
+  },
+  {
+    "type": {"S": "test3"},
+    "id": {"S": "2"},
+    "attr3": {"S":  "attr3value"},
+    "attr4": {"S":  "attr4value"}
+  },
+  {
+    "type": {"S": "test3"},
+    "id": {"S": "3"},
+    "attr5": {"S":  "attr5value"},
+    "attr6": {"S":  "attr6value"}
+  }
+]

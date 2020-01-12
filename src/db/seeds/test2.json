@@ -1,0 +1,20 @@
+[
+  {
+    "type": "test1",
+    "id": "1",
+    "attr1": "attr1value",
+    "attr2": "attr2value"
+  },
+  {
+    "type": "test2",
+    "id": "2",
+    "attr3": "attr3value",
+    "attr4": "attr4value"
+  },
+  {
+    "type": "test3",
+    "id": "3",
+    "attr5": "attr5value",
+    "attr6": "attr6value"
+  }
+]
