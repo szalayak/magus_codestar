@@ -1,6 +1,6 @@
-import AWS, {DynamoDB} from "aws-sdk";
+import AWS, { DynamoDB } from "aws-sdk";
 import config from "./config";
-import {CreateTableInput} from "aws-sdk/clients/dynamodb";
+import { CreateTableInput } from "aws-sdk/clients/dynamodb";
 
 const env = process.env.NODE_ENV || "development";
 
@@ -15,12 +15,12 @@ const db = new DynamoDB();
 const params: CreateTableInput = {
     TableName: "magus",
     KeySchema: [
-        {AttributeName: "type", KeyType: "HASH"},  //Partition key
-        {AttributeName: "id", KeyType: "RANGE"}
+        { AttributeName: "type", KeyType: "HASH" },  //Partition key
+        { AttributeName: "id", KeyType: "RANGE" }
     ],
     AttributeDefinitions: [
-        {AttributeName: "type", AttributeType: "S"},
-        {AttributeName: "id", AttributeType: "S"}
+        { AttributeName: "type", AttributeType: "S" },
+        { AttributeName: "id", AttributeType: "S" }
     ],
     ProvisionedThroughput: {
         ReadCapacityUnits: 5,
@@ -28,21 +28,37 @@ const params: CreateTableInput = {
     }
 };
 
-const createTable = (params: CreateTableInput) => {
-    db.createTable(params, (err, data) => {
-        if (err) {
-            console.error(JSON.stringify(err));
-        } else {
-            console.log("Created table. Table description JSON:", JSON.stringify(data, null, 2));
-        }
+const describeTable = async (params: CreateTableInput) => {
+    return new Promise((resolve, reject) => {
+        db.describeTable({
+            TableName: params.TableName
+        }, (err, data) => {
+            return err ? resolve() : reject(`Table ${data.Table.TableName} already exists. Nothing to do.`)
+        });
     });
 };
 
-db.describeTable({
-    TableName: "magus"
-}, (err, data) => {
-    return err ? createTable(params) : console.log(`Table ${data.Table.TableName} already exists. Nothing to do.`)
-});
+const createTable = async (params: CreateTableInput) => {
+    return new Promise((resolve, reject) => {
+        db.createTable(params, (err, data) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(data);
+            }
+        });
+    })
+};
 
+const up = async () => {
+    try{
+        await describeTable(params);
+        await createTable(params);
+    } catch(e){
+        console.log(e);
+    }
+};
+
+up();
 
 
