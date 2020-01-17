@@ -12,10 +12,42 @@ AWS.config.update(config[env]);
 const db = new DynamoDB();
 
 // create the table parameters
-const params: CreateTableInput = {
-    TableName: "magus",
+const libraryParams: CreateTableInput = {
+    TableName: "magus-library",
     KeySchema: [
         { AttributeName: "type", KeyType: "HASH" },  //Partition key
+        { AttributeName: "id", KeyType: "RANGE" }
+    ],
+    AttributeDefinitions: [
+        { AttributeName: "type", AttributeType: "S" },
+        { AttributeName: "id", AttributeType: "S" }
+    ],
+    ProvisionedThroughput: {
+        ReadCapacityUnits: 5,
+        WriteCapacityUnits: 5
+    }
+};
+
+const eventParams: CreateTableInput = {
+    TableName: "magus-events",
+    KeySchema: [
+        { AttributeName: "type", KeyType: "HASH" },  //Partition key
+        { AttributeName: "id", KeyType: "RANGE" }
+    ],
+    AttributeDefinitions: [
+        { AttributeName: "type", AttributeType: "S" },
+        { AttributeName: "id", AttributeType: "S" }
+    ],
+    ProvisionedThroughput: {
+        ReadCapacityUnits: 5,
+        WriteCapacityUnits: 5
+    }
+};
+
+const characterParams: CreateTableInput = {
+    TableName: "magus-characters",
+    KeySchema: [
+        { AttributeName: "userId", KeyType: "HASH" },  //Partition key
         { AttributeName: "id", KeyType: "RANGE" }
     ],
     AttributeDefinitions: [
@@ -52,11 +84,26 @@ const createTable = async (params: CreateTableInput) => {
 
 const up = async () => {
     try{
-        await describeTable(params);
-        await createTable(params);
+        await describeTable(libraryParams);
+        await createTable(libraryParams);
     } catch(e){
         console.log(e);
     }
+
+    try{
+        await describeTable(eventParams);
+        await createTable(eventParams);
+    } catch(e){
+        console.log(e);
+    }
+
+    try{
+        await describeTable(characterParams);
+        await createTable(characterParams);
+    } catch(e){
+        console.log(e);
+    }    
+
 };
 
 up();
